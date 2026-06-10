@@ -1,0 +1,74 @@
+# Normalized Import Format
+
+Imports are append-friendly evidence batches. The importer upserts candidates and roles, then appends events, scorecards, and nudges.
+
+```json
+{
+  "sourceBatch": {
+    "id": "slack-2026-06-10-24h",
+    "label": "Slack #speedboat-squad-hiring, last 24h",
+    "importedBy": "Codex",
+    "sourceType": "slack"
+  },
+  "candidates": [
+    {
+      "externalId": "example-candidate",
+      "name": "Example Candidate",
+      "role": "Product Engineer",
+      "source": "LHH",
+      "stage": "Final Comparison",
+      "status": "active",
+      "driveUrl": "https://drive.google.com/..."
+    }
+  ],
+  "events": [
+    {
+      "candidateExternalId": "example-candidate",
+      "candidateName": "Example Candidate",
+      "role": "Product Engineer",
+      "occurredAt": "2026-06-05T00:09:18.000Z",
+      "sourceType": "slack",
+      "sourceLabel": "#speedboat-squad-hiring",
+      "author": "Hiring Lead",
+      "title": "Final calibration requested",
+      "body": "The candidate completed the case study and interview loop. The team wants to compare against 2-3 more candidates before making a decision.",
+      "evidenceWeight": 0.85
+    }
+  ],
+  "scorecards": [
+    {
+      "candidateExternalId": "example-candidate",
+      "candidateName": "Example Candidate",
+      "role": "Product Engineer",
+      "reviewer": "Codex",
+      "reviewerType": "llm",
+      "rubric": "case-study",
+      "summary": "Strong product-engineering signal with open backend depth probes.",
+      "recommendation": "advance",
+      "scores": {
+        "ambiguity_to_structure": 8,
+        "product_judgment": 8,
+        "ai_native_leverage": 7
+      }
+    }
+  ],
+  "nudges": [
+    {
+      "candidateExternalId": "example-candidate",
+      "candidateName": "Example Candidate",
+      "role": "Product Engineer",
+      "owner": "Hiring Lead",
+      "reason": "Decide whether this candidate remains the benchmark after 2-3 more candidates.",
+      "dueAt": "2026-06-11T18:00:00.000Z"
+    }
+  ]
+}
+```
+
+## Source Types
+
+Use one of: `slack`, `gmail`, `granola`, `local_file`, `case_study`, `human_note`, `llm_review`, `drive`, `other`.
+
+## Retention Boundary
+
+Before case study, keep records thin: name, role, source, stage, disposition, and next action. Full dossiers start at case study.
