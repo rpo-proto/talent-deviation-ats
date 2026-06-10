@@ -42,6 +42,34 @@ a {
   padding: 22px;
 }
 
+.auth-page {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  max-width: 420px;
+  padding: 24px;
+  text-align: center;
+}
+
+.auth-card h1 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.auth-card p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .topbar {
   align-items: center;
   display: flex;
@@ -77,6 +105,25 @@ h1 {
   align-items: center;
   display: flex;
   gap: 10px;
+}
+
+.auth-control {
+  align-items: center;
+  display: inline-flex;
+  min-height: 38px;
+}
+
+.local-mode {
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 30px;
+  padding: 0 10px;
 }
 
 .icon-button {

@@ -12,6 +12,7 @@
     "seed:roster": "tsx scripts/seed-local-roster.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.5.0",
     "better-sqlite3": "^11.8.1",
     "csv-parse": "^5.6.0",
     "lucide-react": "^0.468.0",

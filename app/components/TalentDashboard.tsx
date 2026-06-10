@@ -1,5 +1,6 @@
 "use client";
 
+import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import {
   AlertCircle,
   Archive,
@@ -77,6 +78,7 @@ export function TalentDashboard({ data }: Props) {
     : [];
   const selectedScorecards = selectedCandidate ? data.scorecards.filter((scorecard) => scorecard.candidateId === selectedCandidate.id) : [];
   const selectedNudges = selectedCandidate ? data.nudges.filter((nudge) => nudge.candidateId === selectedCandidate.id) : [];
+  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith("pk_"));
 
   const openNudges = data.nudges.filter((nudge) => nudge.status === "open");
   const caseStudyCandidates = data.candidates.filter((candidate) => candidate.stageOrder >= DOSSIER_UNLOCK_ORDER && candidate.status !== "declined");
@@ -92,6 +94,7 @@ export function TalentDashboard({ data }: Props) {
           <h1>Talent Deviation ATS</h1>
         </div>
         <div className="top-actions">
+          <AuthControl clerkConfigured={clerkConfigured} />
           {data.driveRootUrl ? (
             <a className="icon-button" href={data.driveRootUrl} target="_blank" rel="noreferrer" title="Open private Drive source folder">
               <Archive size={18} />
@@ -242,6 +245,38 @@ export function TalentDashboard({ data }: Props) {
         </aside>
       </section>
     </main>
+  );
+}
+
+function AuthControl({ clerkConfigured }: { clerkConfigured: boolean }) {
+  if (!clerkConfigured) {
+    return <span className="local-mode">Local mode</span>;
+  }
+
+  return <ClerkAuthControl />;
+}
+
+function ClerkAuthControl() {
+  const { isLoaded, isSignedIn } = useUser();
+
+  if (!isLoaded) {
+    return <span className="local-mode">Auth loading</span>;
+  }
+
+  if (isSignedIn) {
+    return (
+      <div className="auth-control">
+        <UserButton />
+      </div>
+    );
+  }
+
+  return (
+    <SignInButton mode="modal">
+      <button className="icon-button" type="button">
+        Sign in
+      </button>
+    </SignInButton>
   );
 }
 
