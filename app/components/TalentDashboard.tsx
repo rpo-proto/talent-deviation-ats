@@ -7,6 +7,7 @@ import {
   ChevronRight,
   ExternalLink,
   FileSearch,
+  FileText,
   GitBranch,
   Inbox,
   MessageSquareText,
@@ -15,7 +16,7 @@ import {
   Sparkles,
   UserRoundCheck
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 import { DOSSIER_UNLOCK_ORDER, STAGES } from "@/app/lib/stages";
 import type { Candidate, DashboardData, EvidenceEvent, Nudge, Scorecard } from "@/app/lib/types";
@@ -260,14 +261,23 @@ function CandidateCard({
   const reason = terminal ? shortReason(event?.body) : "";
 
   return (
-    <button
+    <article
       className={`candidate-card ${selected ? "selected" : ""} ${terminal ? "candidate-terminal" : ""}`}
       onClick={onSelect}
-      type="button"
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      role="button"
+      tabIndex={0}
     >
       <span className="candidate-name">{candidate.name}</span>
       <span className="candidate-meta">{candidate.source ?? candidate.roleTitle}</span>
       {reason ? <span className="candidate-reason">{reason}</span> : null}
+      <CandidateResourceLinks candidate={candidate} compact />
       <span className="candidate-footer">
         {candidate.stageOrder >= DOSSIER_UNLOCK_ORDER ? (
           <>
@@ -279,7 +289,49 @@ function CandidateCard({
           </>
         )}
       </span>
-    </button>
+    </article>
+  );
+}
+
+function CandidateResourceLinks({ candidate, compact = false }: { candidate: Candidate; compact?: boolean }) {
+  const links: Array<{ href: string; icon: ReactNode; label: string; title: string }> = [];
+
+  if (candidate.profileUrl) {
+    links.push({
+      href: candidate.profileUrl,
+      icon: <FileText size={compact ? 13 : 16} />,
+      label: "Profile",
+      title: "Open generated candidate profile"
+    });
+  }
+
+  if (candidate.resumeUrl) {
+    links.push({
+      href: candidate.resumeUrl,
+      icon: <ExternalLink size={compact ? 13 : 16} />,
+      label: "Resume",
+      title: "Open resume or candidate document"
+    });
+  }
+
+  if (links.length === 0) return null;
+
+  return (
+    <span className={compact ? "resource-links resource-links-compact" : "resource-links"}>
+      {links.map((link) => (
+        <a
+          href={link.href}
+          key={link.label}
+          onClick={(event) => event.stopPropagation()}
+          rel="noreferrer"
+          target="_blank"
+          title={link.title}
+        >
+          {link.icon}
+          <span>{link.label}</span>
+        </a>
+      ))}
+    </span>
   );
 }
 
@@ -364,12 +416,15 @@ function CandidateDossier({
         </div>
       </div>
 
-      {candidate.driveUrl ? (
-        <a className="drive-link" href={candidate.driveUrl} target="_blank" rel="noreferrer">
-          <ExternalLink size={16} />
-          Open private source folder
-        </a>
-      ) : null}
+      <div className="dossier-links">
+        <CandidateResourceLinks candidate={candidate} />
+        {candidate.driveUrl ? (
+          <a className="drive-link" href={candidate.driveUrl} target="_blank" rel="noreferrer">
+            <ExternalLink size={16} />
+            Open private source folder
+          </a>
+        ) : null}
+      </div>
 
       {!unlocked ? (
         <div className="locked">

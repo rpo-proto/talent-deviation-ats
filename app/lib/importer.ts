@@ -71,9 +71,9 @@ function upsertCandidate(candidate: NonNullable<NormalizedImport["candidates"]>[
     db.prepare(`
       INSERT INTO candidates (
         id, external_id, role_id, name, email, linkedin_url, source, stage, stage_order,
-        status, drive_url, retained, last_activity_at, updated_at
+        status, drive_url, profile_url, resume_url, retained, last_activity_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       candidateId,
       candidate.externalId ?? null,
@@ -86,6 +86,8 @@ function upsertCandidate(candidate: NonNullable<NormalizedImport["candidates"]>[
       order,
       candidate.status ?? "active",
       candidate.driveUrl ?? null,
+      candidate.profileUrl ?? null,
+      candidate.resumeUrl ?? null,
       retained,
       candidate.lastActivityAt ?? null,
       nowIso()
@@ -104,6 +106,8 @@ function upsertCandidate(candidate: NonNullable<NormalizedImport["candidates"]>[
       stage_order = ?,
       status = COALESCE(?, status),
       drive_url = COALESCE(?, drive_url),
+      profile_url = COALESCE(?, profile_url),
+      resume_url = COALESCE(?, resume_url),
       retained = MAX(retained, ?),
       last_activity_at = COALESCE(?, last_activity_at),
       updated_at = ?
@@ -117,6 +121,8 @@ function upsertCandidate(candidate: NonNullable<NormalizedImport["candidates"]>[
     order,
     candidate.status ?? null,
     candidate.driveUrl ?? null,
+    candidate.profileUrl ?? null,
+    candidate.resumeUrl ?? null,
     retained,
     candidate.lastActivityAt ?? null,
     nowIso(),

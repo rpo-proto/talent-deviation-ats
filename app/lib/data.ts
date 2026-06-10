@@ -16,6 +16,8 @@ type CandidateRow = {
   stage_order: number;
   status: string;
   drive_url: string | null;
+  profile_url: string | null;
+  resume_url: string | null;
   retained: number;
   last_activity_at: string | null;
   created_at: string;
@@ -73,6 +75,8 @@ function candidateFromRow(row: CandidateRow): Candidate {
     stageOrder: row.stage_order,
     status: row.status,
     driveUrl: row.drive_url,
+    profileUrl: row.profile_url,
+    resumeUrl: row.resume_url,
     retained: row.retained,
     lastActivityAt: row.last_activity_at,
     createdAt: row.created_at,

@@ -54,6 +54,8 @@ export function migrate(db = getDb()) {
       stage_order INTEGER NOT NULL,
       status TEXT NOT NULL DEFAULT 'active',
       drive_url TEXT,
+      profile_url TEXT,
+      resume_url TEXT,
       retained INTEGER NOT NULL DEFAULT 0,
       last_activity_at TEXT,
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -119,8 +121,18 @@ export function migrate(db = getDb()) {
       imported_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  addColumnIfMissing(db, "candidates", "profile_url", "TEXT");
+  addColumnIfMissing(db, "candidates", "resume_url", "TEXT");
 }
 
 export function id(prefix: string) {
   return `${prefix}_${crypto.randomUUID()}`;
+}
+
+function addColumnIfMissing(db: Database.Database, table: string, column: string, definition: string) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  if (!columns.some((item) => item.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
 }

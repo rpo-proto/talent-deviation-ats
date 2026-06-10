@@ -29,6 +29,8 @@ export type Candidate = {
   stageOrder: number;
   status: string;
   driveUrl?: string | null;
+  profileUrl?: string | null;
+  resumeUrl?: string | null;
   retained: number;
   lastActivityAt?: string | null;
   createdAt: string;
@@ -105,6 +107,8 @@ export type NormalizedImport = {
     stage?: string;
     status?: string;
     driveUrl?: string;
+    profileUrl?: string;
+    resumeUrl?: string;
     retained?: boolean;
     lastActivityAt?: string;
   }>;

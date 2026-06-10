@@ -408,6 +408,11 @@ h1 {
   box-shadow: 0 0 0 2px rgba(29, 95, 145, 0.12);
 }
 
+.candidate-card:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .candidate-terminal {
   background: #fbf8f4;
   border-color: #d8c9bd;
@@ -429,6 +434,42 @@ h1 {
   border-left: 2px solid #c8b7a7;
   line-height: 1.35;
   padding-left: 7px;
+}
+
+.resource-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.resource-links a {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 9px;
+  text-decoration: none;
+}
+
+.resource-links-compact {
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+.resource-links-compact a {
+  background: var(--surface-muted);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  min-height: 26px;
+  padding: 0 7px;
 }
 
 .candidate-footer {
@@ -492,6 +533,10 @@ h1 {
 .detail-grid strong {
   display: block;
   font-size: 13px;
+}
+
+.dossier-links {
+  margin-bottom: 14px;
 }
 
 .drive-link {

@@ -9,6 +9,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "import": "tsx scripts/import-normalized.ts",
+    "materialize:packets": "tsx scripts/materialize-candidate-packets.ts",
     "seed:roster": "tsx scripts/seed-local-roster.ts"
   },
   "dependencies": {

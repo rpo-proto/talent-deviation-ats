@@ -7,10 +7,10 @@ The public repo contains app code, schema, import formats, and documentation. It
 ## Architecture
 
 - **Code:** public-safe Next.js + SQLite app.
-- **Private runtime data:** gitignored `.local/talent.db` and `.local/artifacts/`.
+- **Private runtime data:** gitignored `.local/talent.db`, local artifacts, and configured operations-folder packets.
 - **Ingestion:** agent-assisted normalized JSON imports from Gmail, Slack, Granola, local files, and case-study reviews.
 - **Operational export:** human-readable snapshots to a private folder you configure.
-- **Source links:** candidate records can link back to private Google Drive folders for resumes and raw artifacts.
+- **Source links:** candidate records can link to generated private profiles, resumes, raw artifacts, and Google Drive folders.
 - **Auth:** optional Clerk protection when Clerk environment variables are present.
 
 ## V1 Scope
@@ -57,3 +57,13 @@ npm run import -- .local/imports/slack-24h.json
 ```
 
 See [docs/import-format.md](docs/import-format.md).
+
+## Candidate Packets
+
+Generate private markdown profiles and candidate card links after imports:
+
+```bash
+npm run materialize:packets
+```
+
+Set `TALENT_ATS_CANDIDATE_PACKET_DIR` to your private operations folder and `TALENT_ATS_ALLOWED_FILE_ROOTS` to the local folders the app is allowed to serve through `/api/private-file`.
