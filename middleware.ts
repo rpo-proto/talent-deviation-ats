@@ -7,6 +7,9 @@ const clerkSecretKey = process.env.CLERK_SECRET_KEY ?? "";
 const clerkConfigured = Boolean(
   clerkPublishableKey.startsWith("pk_") && clerkSecretKey.startsWith("sk_")
 );
+const authRequired =
+  process.env.TALENT_ATS_REQUIRE_AUTH === "true" ||
+  (process.env.VERCEL === "1" && process.env.TALENT_ATS_ALLOW_UNAUTHENTICATED !== "true");
 
 const authMiddleware = clerkConfigured
   ? clerkMiddleware(async (auth, req) => {
@@ -19,6 +22,17 @@ const authMiddleware = clerkConfigured
   : undefined;
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (authRequired && !clerkConfigured && !isPublicRoute(req)) {
+    if (req.nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Clerk is required but not configured for this deployment." },
+        { status: 503 }
+      );
+    }
+
+    return NextResponse.redirect(new URL("/sign-in", req.url));
+  }
+
   if (!authMiddleware) {
     return NextResponse.next();
   }

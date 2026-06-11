@@ -48,6 +48,8 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
 
 With both Clerk keys present, every route is protected except `/sign-in` and `/sign-up`.
 
+Vercel deployments require auth by default. If Clerk keys are missing, hosted routes redirect to the setup/sign-in screen and API routes return `503`; local development can still run without Clerk.
+
 ## Importing Evidence
 
 Normalized import files are JSON. Keep private imports under `.local/imports/`.
