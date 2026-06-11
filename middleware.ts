@@ -36,6 +36,10 @@ const authMiddleware = clerkConfigured
   : undefined;
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  if (!authRequired) {
+    return NextResponse.next();
+  }
+
   if (authRequired && !clerkConfigured && !isPublicRoute(req)) {
     if (req.nextUrl.pathname.startsWith("/api/")) {
       return NextResponse.json(
