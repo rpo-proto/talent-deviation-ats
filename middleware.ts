@@ -17,7 +17,17 @@ const authMiddleware = clerkConfigured
         return;
       }
 
-      await auth.protect();
+      if (req.nextUrl.pathname.startsWith("/api/")) {
+        const { userId } = await auth();
+
+        if (!userId) {
+          return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+        }
+
+        return;
+      }
+
+      await auth.protect({ unauthenticatedUrl: "/sign-in" });
     })
   : undefined;
 
