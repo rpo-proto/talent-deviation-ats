@@ -27,7 +27,11 @@ const authMiddleware = clerkConfigured
         return;
       }
 
-      await auth.protect({ unauthenticatedUrl: "/sign-in" });
+      const { userId, redirectToSignIn } = await auth();
+
+      if (!userId) {
+        return redirectToSignIn({ returnBackUrl: req.url });
+      }
     })
   : undefined;
 
