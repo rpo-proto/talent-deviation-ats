@@ -12,27 +12,35 @@ const authRequired =
   (process.env.VERCEL === "1" && process.env.TALENT_ATS_ALLOW_UNAUTHENTICATED !== "true");
 
 const authMiddleware = clerkConfigured
-  ? clerkMiddleware(async (auth, req) => {
-      if (isPublicRoute(req)) {
-        return;
-      }
-
-      if (req.nextUrl.pathname.startsWith("/api/")) {
-        const { userId } = await auth();
-
-        if (!userId) {
-          return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  ? clerkMiddleware(
+      async (auth, req) => {
+        if (isPublicRoute(req)) {
+          return;
         }
 
-        return;
-      }
+        if (req.nextUrl.pathname.startsWith("/api/")) {
+          const { userId } = await auth();
 
-      const { userId, redirectToSignIn } = await auth();
+          if (!userId) {
+            return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+          }
 
-      if (!userId) {
-        return redirectToSignIn({ returnBackUrl: req.url });
+          return;
+        }
+
+        const { userId, redirectToSignIn } = await auth();
+
+        if (!userId) {
+          return redirectToSignIn({ returnBackUrl: req.url });
+        }
+      },
+      {
+        afterSignInUrl: "/",
+        afterSignUpUrl: "/",
+        signInUrl: "/sign-in",
+        signUpUrl: "/sign-up"
       }
-    })
+    )
   : undefined;
 
 export default function middleware(req: NextRequest, event: NextFetchEvent) {
