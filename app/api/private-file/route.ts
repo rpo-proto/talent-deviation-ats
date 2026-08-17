@@ -23,11 +23,6 @@ function configuredRoots() {
   return roots.map((root) => (path.isAbsolute(root) ? root : path.join(process.cwd(), root)));
 }
 
-function isInsideRoot(filePath: string, root: string) {
-  const relative = path.relative(root, filePath);
-  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
-}
-
 export async function GET(request: NextRequest) {
   const requestedPath = request.nextUrl.searchParams.get("path");
   if (!requestedPath) {
@@ -38,6 +33,8 @@ export async function GET(request: NextRequest) {
     ? requestedPath
     : path.join(process.cwd(), requestedPath);
 
+  // realpathSync normalizes the path and resolves symlinks, so the prefix check
+  // against each realpath'd root below cannot be bypassed with ".." or symlinks.
   let filePath: string;
   try {
     filePath = fs.realpathSync(absolutePath);
@@ -55,21 +52,28 @@ export async function GET(request: NextRequest) {
     })
     .filter((root): root is string => Boolean(root));
 
-  if (!allowedRoots.some((root) => isInsideRoot(filePath, root))) {
-    return NextResponse.json({ error: "File is outside allowed roots" }, { status: 403 });
+  // The file is served inside the loop so every fs call is dominated by this root's
+  // startsWith check: CodeQL only accepts that shape as a js/path-injection barrier,
+  // so keep it inline rather than hoisting it into a helper or an array predicate.
+  for (const root of allowedRoots) {
+    if (!filePath.startsWith(root + path.sep)) {
+      continue;
+    }
+
+    const stat = fs.statSync(filePath);
+    if (!stat.isFile()) {
+      return NextResponse.json({ error: "Path is not a file" }, { status: 404 });
+    }
+
+    const body = fs.readFileSync(filePath);
+    const extension = path.extname(filePath).toLowerCase();
+    const headers = new Headers({
+      "Content-Type": CONTENT_TYPES[extension] ?? "application/octet-stream",
+      "Content-Disposition": `inline; filename="${path.basename(filePath).replaceAll("\"", "")}"`
+    });
+
+    return new NextResponse(body, { headers });
   }
 
-  const stat = fs.statSync(filePath);
-  if (!stat.isFile()) {
-    return NextResponse.json({ error: "Path is not a file" }, { status: 404 });
-  }
-
-  const body = fs.readFileSync(filePath);
-  const extension = path.extname(filePath).toLowerCase();
-  const headers = new Headers({
-    "Content-Type": CONTENT_TYPES[extension] ?? "application/octet-stream",
-    "Content-Disposition": `inline; filename="${path.basename(filePath).replaceAll("\"", "")}"`
-  });
-
-  return new NextResponse(body, { headers });
+  return NextResponse.json({ error: "File is outside allowed roots" }, { status: 403 });
 }
